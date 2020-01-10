@@ -14,6 +14,8 @@ import { DatabaseUtility } from './common/database-utility';
 import { LocationService } from './components/location/location.service';
 import { UserResolver } from './components/user/user.resolver';
 import { UserService } from './components/user/user.service';
+import { UserRoleResolver } from './components/user/user-role/user-role.resolver';
+import { UserRoleService } from './components/user/user-role/user-role.service';
 
 @Module({
   imports: [GraphQLModule.forRoot({ autoSchemaFile: 'schema.gql' })],
@@ -33,6 +35,8 @@ import { UserService } from './components/user/user.service';
     RegionResolver,
     UserService,
     UserResolver,
+    UserRoleResolver,
+    UserRoleService,
   ],
 })
 export class AppModule {}

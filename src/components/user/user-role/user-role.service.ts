@@ -1,6 +1,5 @@
 import { Injectable } from '@nestjs/common';
-import { UserRole } from '../../model/userRole';
-import { DatabaseService } from '../../core/database.service';
+import { DatabaseService } from '../../../core/database.service';
 import { generate } from 'shortid';
 import {
   CreateUserRoleOutputDto,

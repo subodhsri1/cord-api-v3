@@ -1,9 +1,9 @@
 import { Field, ObjectType } from 'type-graphql';
-import { Location } from '../../../model/location';
-import {  Role } from '../../../model/role';
+import { Location } from '../location';
+import { Role } from '../role';
 
 @ObjectType()
-export class UserRole {
+export class UserRole implements IUserRole {
   @Field()
   role: Role;
 
@@ -13,4 +13,9 @@ export class UserRole {
   static from(userRole: UserRole) {
     return Object.assign(new UserRole(), userRole);
   }
+}
+
+export interface IUserRole {
+  role: Role;
+  locations: Location[];
 }

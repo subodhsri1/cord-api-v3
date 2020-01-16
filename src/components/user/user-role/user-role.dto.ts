@@ -1,5 +1,7 @@
 import { Field, InputType, ObjectType } from 'type-graphql';
 import { Role } from '../role';
+import { Location } from '../../location/location'
+
 
 // CREATE
 
@@ -26,7 +28,7 @@ export class CreateUserRoleOutput {
     @Field(type => Role)
     role: Role;
 
-    @Field({nullable: true})
+    @Field(type => [Location], {nullable: true})
     locations: Location[];
 }
 

@@ -9,25 +9,6 @@ import {
   Int,
 } from 'type-graphql';
 
-@ObjectType()
-@InputType('FileNodeInput')
-export class FileNode implements IBaseNode {
-  @Field()
-  id: string;
-
-  @Field(type => String)
-  fileNodeType: FileNodeType;
-
-  @Field()
-  name: string;
-
-  @Field({ nullable: true })
-  parents?: FileParentRef[];
-
-  @Field(type => String, { nullable: true })
-  category?: FileNodeCategory;
-}
-
 interface IBaseNode {
   id: string;
   fileNodeType: FileNodeType;
@@ -72,39 +53,38 @@ export class FileVersion {
 }
 
 @ObjectType()
-@InputType('FileInput')
-export class File extends FileNode implements IFile {
+@InputType('FileNodeInput')
+export class FileNode implements IBaseNode {
   @Field()
   id: string;
 
   @Field(type => String)
+  fileNodeType: FileNodeType;
+
+  @Field()
   name: string;
 
-  @Field(type => String)
-  category: FileNodeCategory;
+  @Field({ nullable: true })
+  parents?: FileParentRef[];
 
+  @Field(type => String, { nullable: true })
+  category?: FileNodeCategory;
+}
+
+@ObjectType()
+@InputType('FileInput')
+export class File extends FileNode implements IFile {
   @Field(type => [FileVersion], { nullable: true })
   versions: FileVersion[];
 
   @Field(type => Int, { nullable: true })
   size: number;
 
-  @Field(type => [FileParentRef])
-  parents: FileParentRef[];
 }
 
 @ObjectType()
 @InputType('DirectoryInput')
 export class Directory extends FileNode implements IDirectory {
-  @Field()
-  id: string;
-
-  @Field(type => String)
-  name: string;
-
-  @Field(type => String)
-  category: FileNodeCategory;
-
   @Field(type => [FileVersion], { nullable: true })
   versions: FileVersion[];
 
@@ -114,6 +94,4 @@ export class Directory extends FileNode implements IDirectory {
   @Field(type => [String])
   childrenId: string[];
 
-  @Field(type => [FileParentRef])
-  parents: FileParentRef[];
 }

@@ -16,6 +16,7 @@ export NEO4J_URL=bolt://localhost
 export NEO4J_USERNAME=neo4j
 export NEO4J_PASSWORD=asdf
 export NODE_ENV=development
+export JWT_AUTH_KEY=asdf
 ```
 You will also need the following environment variables set:  get values from the team
 ```
@@ -27,7 +28,14 @@ export FILES_S3_BUCKET=
 
 ## Usage
 
-Install: `yarn`  
+Install: 
+1. `brew install gcc`
+1. `npm install -g node-gyp`
+1. `CXX=g++ yarn install argon2`
+1. `yarn`  
+
+See [argon2](https://www.npmjs.com/package/argon2) for more info on installing argon2.
+
 Develop: `yarn run start:dev`  
 Test: `yarn run test:e2e`  
 Create new model class: `nest g class model/className --no-spec`  

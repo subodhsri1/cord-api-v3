@@ -1,15 +1,18 @@
-import { gql } from 'apollo-server-core';
-import { isValid } from 'shortid';
+import * as faker from 'faker';
+
 import {
+  TestApp,
   createOrganization,
   createTestApp,
   createToken,
   createUser,
   fragments,
-  TestApp,
 } from './utility';
+
+import { Organization } from '../src/components/organization';
+import { gql } from 'apollo-server-core';
+import { isValid } from 'shortid';
 import { times } from 'lodash';
-import * as faker from 'faker';
 
 describe('Organization e2e', () => {
   let app: TestApp;
@@ -19,7 +22,8 @@ describe('Organization e2e', () => {
     await createToken(app);
     await createUser(app);
   });
-  afterEach(async () => {
+
+  afterAll(async () => {
     await app.close();
   });
 
@@ -49,6 +53,7 @@ describe('Organization e2e', () => {
   // UPDATE ORG
   it('update organization', async () => {
     const org = await createOrganization(app);
+
     const newName = faker.company.companyName();
 
     const result = await app.graphql.mutate(
@@ -71,6 +76,7 @@ describe('Organization e2e', () => {
         },
       },
     );
+
     const updated = result?.updateOrganization?.organization;
     expect(updated).toBeTruthy();
     expect(updated.id).toBe(org.id);
@@ -81,7 +87,7 @@ describe('Organization e2e', () => {
   it('delete organization', async () => {
     const org = await createOrganization(app);
 
-    await app.graphql.mutate(
+    const result = await app.graphql.mutate(
       gql`
         mutation deleteOrganization($id: ID!) {
           deleteOrganization(id: $id)
@@ -91,6 +97,9 @@ describe('Organization e2e', () => {
         id: org.id,
       },
     );
+
+    const actual: Organization | undefined = result.deleteOrganization;
+    expect(actual).toBeTruthy();
   });
 
   // LIST ORGs
@@ -112,7 +121,7 @@ describe('Organization e2e', () => {
       }
       ${fragments.org}
     `);
-
-    expect(organizations.items).toHaveLength(orgs.length);
+    
+    expect(organizations.items.length).toBeGreaterThan(10);
   });
 });

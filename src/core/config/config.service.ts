@@ -1,8 +1,8 @@
+import { EnvironmentService } from './environment.service';
 import { Injectable } from '@nestjs/common';
 import { LazyGetter as Lazy } from 'lazy-get-decorator';
-import { Config as Neo4JDriverConfig } from 'neo4j-driver/types/v1';
 import { LogLevel } from '../logger';
-import { EnvironmentService } from './environment.service';
+import { Config as Neo4JDriverConfig } from 'neo4j-driver/types/v1';
 
 /**
  * Application configuration.
@@ -13,6 +13,8 @@ import { EnvironmentService } from './environment.service';
 export class ConfigService {
   port = this.env.number('port').optional(3000);
   globalPrefix = 'api';
+
+  jwtKey = this.env.string('JWT_AUTH_KEY').optional('cord-field');
 
   @Lazy() get neo4j() {
     const driverConfig: Neo4JDriverConfig = {

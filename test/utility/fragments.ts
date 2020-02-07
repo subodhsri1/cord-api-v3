@@ -42,4 +42,60 @@ export const fragments = {
       }
     }
   `,
+  education: gql`
+    fragment education on Education {
+      id
+      createdAt
+      degree {
+        value
+        canRead
+        canEdit
+      }
+      major {
+        value
+        canRead
+        canEdit
+      }
+      institution {
+        value
+        canRead
+        canEdit
+      }
+    }
+  `,
+  language: gql`
+  fragment language on Language {
+    id
+    name {
+      value
+      canEdit
+      canRead
+    }
+    displayName {
+      value
+      canEdit
+      canRead
+    }
+    beginFiscalYear {
+      value
+      canEdit
+      canRead
+    }
+    ethnologueName {
+      value
+      canEdit
+      canRead
+    }
+    organizationPopulation {
+      value
+      canEdit
+      canRead
+    }
+    rodNumber {
+      value
+      canEdit
+      canRead
+    }
+  }
+`,
 };

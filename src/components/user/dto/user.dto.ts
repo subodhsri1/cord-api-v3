@@ -1,6 +1,6 @@
 import { Type } from '@nestjs/common';
 import { Field, ObjectType } from 'type-graphql';
-import { Resource, SecuredString } from '../../../common';
+import { Resource, SecuredProperty, SecuredString } from '../../../common';
 
 @ObjectType()
 export class User extends Resource {
@@ -8,26 +8,31 @@ export class User extends Resource {
   static classType = (User as any) as Type<User>;
 
   @Field()
-  readonly email: SecuredString;
+  email: SecuredString;
 
   @Field()
-  readonly realFirstName: SecuredString;
+  realFirstName: SecuredString;
 
   @Field()
-  readonly realLastName: SecuredString;
+  realLastName: SecuredString;
 
   @Field()
-  readonly displayFirstName: SecuredString;
+  displayFirstName: SecuredString;
 
   @Field()
-  readonly displayLastName: SecuredString;
+  displayLastName: SecuredString;
 
   @Field()
-  readonly phone: SecuredString;
+  phone: SecuredString;
 
   @Field()
-  readonly timezone: SecuredString;
+  timezone: SecuredString;
 
   @Field()
-  readonly bio: SecuredString;
+  bio: SecuredString;
 }
+
+@ObjectType({
+  description: SecuredProperty.descriptionFor('a user'),
+})
+export class SecuredUser extends SecuredProperty(User) {}

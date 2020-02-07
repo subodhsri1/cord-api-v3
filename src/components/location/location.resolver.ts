@@ -1,65 +1,127 @@
 import { Resolver, Args, Query, Mutation } from '@nestjs/graphql';
-import { Location } from './location';
-import { LocationService } from './location.service';
+import { IdArg, RequestUser } from '../../common';
 import {
-  CreateLocationInputDto,
-  CreateLocationOutputDto,
-  ReadLocationInputDto,
-  ReadLocationOutputDto,
-  UpdateLocationInputDto,
-  UpdateLocationOutputDto,
-  DeleteLocationInputDto,
-  DeleteLocationOutputDto,
-  ListLocationsOutputDto,
-  ListLocationsInputDto,
-} from './location.dto';
+  CreateCountryInput,
+  CreateCountryOutput,
+  CreateRegionInput,
+  CreateRegionOutput,
+  CreateZoneInput,
+  CreateZoneOutput,
+  Location,
+  LocationListInput,
+  LocationListOutput,
+  UpdateCountryInput,
+  UpdateCountryOutput,
+  UpdateRegionOutput,
+  UpdateRegionInput,
+  UpdateZoneOutput,
+  UpdateZoneInput,
+} from './dto';
+import { LocationService } from './location.service';
 
-@Resolver(of => Location)
+@Resolver()
 export class LocationResolver {
   constructor(private readonly locationService: LocationService) {}
 
-  @Mutation(returns => CreateLocationOutputDto, {
-    description: 'Create a Location',
-  })
-  async createLocation(
-    @Args('input') { location: input }: CreateLocationInputDto,
-  ): Promise<CreateLocationOutputDto> {
-    return await this.locationService.create(input);
-  }
-
-  @Query(returns => ReadLocationOutputDto, {
+  @Query(() => Location, {
     description: 'Read one Location by id',
   })
-  async readLocation(
-    @Args('input') { location: input }: ReadLocationInputDto,
-  ): Promise<ReadLocationOutputDto> {
-    return await this.locationService.readOne(input);
-  }
-  @Query(returns => ListLocationsOutputDto, {
-    description: 'Query orgainzations',
-  })
-  async locations(
-    @Args('input') { query: input }: ListLocationsInputDto,
-  ): Promise<ListLocationsOutputDto> {
-    return await this.locationService.queryLocations(input);
-  }
-  @Mutation(returns => UpdateLocationOutputDto, {
-    description: 'Update an Location',
-  })
-  async updateLocation(
-    @Args('input')
-    { location: input }: UpdateLocationInputDto,
-  ): Promise<UpdateLocationOutputDto> {
-    return await this.locationService.update(input);
+  async location(
+    @RequestUser() token: string,
+    @IdArg() id: string,
+  ): Promise<Location> {
+    return this.locationService.readOne(id, token);
   }
 
-  @Mutation(returns => DeleteLocationOutputDto, {
-    description: 'Delete an Location',
+  @Query(() => LocationListOutput, {
+    description: 'Look up locations',
+  })
+  async locations(
+    @RequestUser() token: string,
+    @Args({
+      name: 'input',
+      type: () => LocationListInput,
+      defaultValue: LocationListInput.defaultVal,
+    })
+    input: LocationListInput,
+  ): Promise<LocationListOutput> {
+    return this.locationService.list(input, token);
+  }
+
+  @Mutation(() => CreateZoneOutput, {
+    description: 'Create a zone',
+  })
+  async createZone(
+    @RequestUser() token: string,
+    @Args('input') { zone: input }: CreateZoneInput,
+  ): Promise<CreateZoneOutput> {
+    const zone = await this.locationService.createZone(input, token);
+    return { zone };
+  }
+
+  @Mutation(() => CreateRegionOutput, {
+    description: 'Create a region',
+  })
+  async createRegion(
+    @RequestUser() token: string,
+    @Args('input') { region: input }: CreateRegionInput,
+  ): Promise<CreateRegionOutput> {
+    const region = await this.locationService.createRegion(input, token);
+    return { region };
+  }
+
+  @Mutation(() => CreateCountryOutput, {
+    description: 'Create a country',
+  })
+  async createCountry(
+    @RequestUser() token: string,
+    @Args('input') { country: input }: CreateCountryInput,
+  ): Promise<CreateCountryOutput> {
+    const country = await this.locationService.createCountry(input, token);
+    return { country };
+  }
+
+  @Mutation(() => UpdateZoneOutput, {
+    description: 'Update a zone',
+  })
+  async updateZone(
+    @RequestUser() token: string,
+    @Args('input') { zone: input }: UpdateZoneInput,
+  ): Promise<UpdateZoneOutput> {
+    const zone = await this.locationService.updateZone(input, token);
+    return { zone };
+  }
+
+  @Mutation(() => UpdateRegionOutput, {
+    description: 'Update a region',
+  })
+  async updateRegion(
+    @RequestUser() token: string,
+    @Args('input') { region: input }: UpdateRegionInput,
+  ): Promise<UpdateRegionOutput> {
+    const region = await this.locationService.updateRegion(input, token);
+    return { region };
+  }
+
+  @Mutation(() => UpdateCountryOutput, {
+    description: 'Update a country',
+  })
+  async updateCountry(
+    @RequestUser() token: string,
+    @Args('input') { country: input }: UpdateCountryInput,
+  ): Promise<UpdateCountryOutput> {
+    const country = await this.locationService.updateCountry(input, token);
+    return { country };
+  }
+
+  @Mutation(() => Boolean, {
+    description: 'Delete a location',
   })
   async deleteLocation(
-    @Args('input')
-    { location: input }: DeleteLocationInputDto,
-  ): Promise<DeleteLocationOutputDto> {
-    return await this.locationService.delete(input);
+    @RequestUser() token: string,
+    @IdArg() id: string,
+  ): Promise<boolean> {
+    await this.locationService.delete(id, token);
+    return true;
   }
 }

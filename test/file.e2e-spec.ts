@@ -1,3 +1,5 @@
+import { Connection } from 'cypher-query-builder';
+import { FileNodeType } from '../src/components/file/dto';
 import { User } from '../src/components/user';
 import {
   TestApp,
@@ -7,8 +9,9 @@ import {
   fragments,
 } from './utility';
 import { gql } from 'apollo-server-core';
-import { isValid } from 'shortid';
+import { generate, isValid } from 'shortid';
 import { times } from 'lodash';
+import { createFile } from './utility/create-file';
 
 describe('File e2e', () => {
   let app: TestApp;
@@ -18,106 +21,44 @@ describe('File e2e', () => {
   });
 
   it('read file node by id', async () => {
-    // create user first
     const token = await createSession(app);
-    const user = await createUser(app);
-    const result = await app.graphql.query(
-      gql`
-        query user($id: ID!) {
-          user(id: $id) {
-            ...user
-          }
-        }
-        ${fragments.user}
-      `,
-      {
-        id: user.id,
-      },
-    );
 
-    const actual: User | undefined = result.user;
-    expect(actual).toBeTruthy();
+    const dbService = await app.get(Connection);
+    const testFile = await dbService
+      .query()
+      .raw(`
+        CREATE (file:FileNode { id: $id, type: $type, name: $name})
+        RETURN file
+        `,
+        {
+          id: generate(),
+          type: FileNodeType.File,
+          name: 'test-file',
+        })
+      .first();
 
-    expect(isValid(actual.id)).toBe(true);
-    expect(actual.email.value).toBe(user.email.value);
-
-    return true;
-  });
-
-  it('update user', async () => {
-    // create user first
-    const token = await createSession(app);
-    const user = await createUser(app);
+    // since file is created, it can be read.
     const result = await app.graphql.mutate(
       gql`
-        mutation updateUser($input: UpdateUserInput!) {
-          updateUser(input: $input) {
-            user {
-              ...user
-            }
+        mutation createFile( $input: CreateFileInput!) {
+          file {
+            type
           }
         }
-        ${fragments.user}
+        ${fragments.file}
       `,
       {
         input: {
-          user: {
-            id: user.id,
-            realFirstName: user.realFirstName.value + ' 2',
-          },
+          uploadId: testFile.file.properties.id,
+          parentId: 'hello',
+          name: 'test-file',
         },
-      },
-    );
-
-    const actual: User | undefined = result.updateUser.user;
-    expect(actual).toBeTruthy();
-
-    expect(isValid(actual.id)).toBe(true);
-    expect(actual.email.value).toBe(user.email.value);
-
-    return true;
-  });
-
-  it('delete user', async () => {
-    // create user first
-    const token = await createSession(app);
-    const user = await createUser(app);
-    const result = await app.graphql.query(
-      gql`
-        mutation deleteUser($id: ID!) {
-          deleteUser(id: $id)
-        }
-      `,
-      {
-        id: user.id,
-      },
-    );
-
-    const actual: User | undefined = result.deleteUser;
+      });
+    
+    const actual = result;
     expect(actual).toBeTruthy();
 
     return true;
-  });
-
-  // LIST USERS
-  it('list view of users', async () => {
-    // create a bunch of users
-    await Promise.all(times(10).map(() => createUser(app)));
-
-    const { users } = await app.graphql.query(gql`
-      query {
-        users {
-          items {
-            ...user
-          }
-          hasMore
-          total
-        }
-      }
-      ${fragments.user}
-    `);
-
-    expect(users.items.length).toBeGreaterThan(9);
   });
 
   afterAll(async () => {

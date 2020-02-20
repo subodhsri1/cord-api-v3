@@ -77,7 +77,12 @@ export class FileService {
     { parentId, uploadId, name }: CreateFileInput,
     session: ISession,
   ): Promise<File> {
-    await this.bucket.moveObject(`temp/${uploadId}`, `${parentId}/${uploadId}`);
+
+    // check if key exists in s3, if not skip moving object
+    if (await this.bucket.getObject(`temp/${uploadId}`)) {
+      await this.bucket.moveObject(`temp/${uploadId}`, `${parentId}/${uploadId}`);
+    }
+
     const result = await this.db
       .query()
       .raw(

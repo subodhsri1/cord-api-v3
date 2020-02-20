@@ -44,6 +44,7 @@ export class FileService {
   }
 
   async getFileNode(id: string, session: ISession): Promise<FileOrDirectory> {
+    // call to s3 service to get file details
     throw new NotImplementedError();
   }
 
